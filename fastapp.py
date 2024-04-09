@@ -1,5 +1,3 @@
-from urllib.request import Request
-
 from PIL import Image
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from starlette.responses import FileResponse
@@ -10,7 +8,7 @@ from tensorflow.keras.models import load_model
 
 app = FastAPI()
 
-animal_model = load_model("models/animal.h5", compile=True)
+animal_model = load_model("models/animal.h5", compile=False)
 animal_input_shape = animal_model.layers[0].input_shape[0]
 animal_classes = {0: 'antelope', 1: 'badger', 2: 'bat', 3: 'bear', 4: 'bee', 5: 'beetle', 6: 'bison', 7: 'boar',
                   8: 'butterfly', 9: 'cat', 10: 'caterpillar', 11: 'chimpanzee', 12: 'cockroach', 13: 'cow',
@@ -34,9 +32,8 @@ animal_classes = {0: 'antelope', 1: 'badger', 2: 'bat', 3: 'bear', 4: 'bee', 5: 
                   87: 'wombat',
                   88: 'woodpecker', 89: 'zebra'}
 
-plant_model = load_model("models/plant.h5", compile=True)
+plant_model = load_model("models/plant.h5", compile=False)
 plant_input_shape = plant_model.layers[0].input_shape
-print(plant_input_shape)
 with open('models/plant_label_transform.pkl', 'rb') as f:
     plant_label_transform = pickle.load(f)
 
