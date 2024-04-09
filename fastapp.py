@@ -48,6 +48,7 @@ async def predict_animal(file: UploadFile = File(...)):
     # Read image contents
     contents = await file.read()
     pil_image = Image.open(io.BytesIO(contents))
+    pil_image = pil_image.convert('RGB')
 
     # Resize image to expected input shape
     pil_image = pil_image.resize((animal_input_shape[1], animal_input_shape[2]))
@@ -73,6 +74,7 @@ async def predict_plant(file: UploadFile = File(...)):
     # Read image contents
     contents = await file.read()
     pil_image = Image.open(io.BytesIO(contents))
+    pil_image = pil_image.convert('RGB')
 
     # Resize image to expected input shape
     pil_image = pil_image.resize((plant_input_shape[1], plant_input_shape[2]))

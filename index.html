@@ -69,6 +69,15 @@
         uploadImage(file);
     }
 
+    function handleFiles(files) {
+        if (files.length > 0) {
+            uploadImage(files[0]);
+        } else {
+            clearImage();
+            document.getElementById("response").textContent = "";
+        }
+    }
+
     function uploadImage(file) {
         document.getElementById("response").textContent = "";
         const reader = new FileReader();
@@ -80,8 +89,10 @@
         reader.readAsDataURL(file);
     }
 
-    function handleFiles(files) {
-        uploadImage(files[0]);
+    function clearImage() {
+        const img = document.getElementById('uploaded-image');
+        img.src = "#"; // Clear the image source
+        img.style.display = 'none'; // Hide the image
     }
 
     function detect(type) {
