@@ -78,6 +78,8 @@
     }
 
     function detect(type) {
+        document.getElementById('response').textContent = "Processing..."
+
         const fileInput = document.getElementById('file-input');
         const file = fileInput.files[0];
         if (file) {
