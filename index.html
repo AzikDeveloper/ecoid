@@ -31,7 +31,13 @@
 
         #response {
             margin-top: 20px;
+            margin-bottom: 20px;
             min-height: 20px;
+        }
+
+        .button {
+            padding: 5px 10px;
+            margin: 0 10px;
         }
     </style>
 </head>
@@ -44,8 +50,8 @@
     </div>
     <img id="uploaded-image" src="#" alt="Uploaded Image">
     <div id="response"></div>
-    <button onclick="detect('animal')">Detect Animal</button>
-    <button onclick="detect('plant')">Detect Plant</button>
+    <button class="button" onclick="detect('animal')">Detect Animal</button>
+    <button class="button" onclick="detect('plant')">Detect Plant</button>
 </div>
 
 <script>
@@ -64,6 +70,7 @@
     }
 
     function uploadImage(file) {
+        document.getElementById("response").textContent = "";
         const reader = new FileReader();
         reader.onload = function (e) {
             const img = document.getElementById('uploaded-image');
