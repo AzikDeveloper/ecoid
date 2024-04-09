@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        #image-upload {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+
+        #uploaded-image {
+            max-width: 100%;
+            max-height: 300px;
+            display: none;
+            margin: 0 auto; /* Add this line to center the image horizontally */
+        }
+
+        #response {
+            margin-top: 20px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="image-upload" ondragover="dragOver(event)" ondrop="dropImage(event)">
+        <p>Drag & Drop image here or click to upload.</p>
+        <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFiles(this.files)">
+    </div>
+    <img id="uploaded-image" src="#" alt="Uploaded Image">
+    <div id="response"></div>
+    <button onclick="detect('animal')">Detect Animal</button>
+    <button onclick="detect('plant')">Detect Plant</button>
+</div>
+
+<script>
+    function allowDrop(event) {
+        event.preventDefault();
+    }
+
+    function dragOver(event) {
+        allowDrop(event);
+    }
+
+    function dropImage(event) {
+        event.preventDefault();
+        const file = event.dataTransfer.files[0];
+        uploadImage(file);
+    }
+
+    function uploadImage(file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const img = document.getElementById('uploaded-image');
+            img.src = e.target.result;
+            img.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function handleFiles(files) {
+        uploadImage(files[0]);
+    }
+
+    function detect(type) {
+        const fileInput = document.getElementById('file-input');
+        const file = fileInput.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            fetch(`/predict/${type}`, {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const responseDiv = document.getElementById('response');
+                    responseDiv.textContent = data.result;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        } else {
+            alert('Please upload an image.');
+        }
+    }
+
+    document.getElementById('image-upload').addEventListener('click', function () {
+        document.getElementById('file-input').click();
+    });
+</script>
+
+</body>
+</html>
