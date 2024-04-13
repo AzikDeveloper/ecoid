@@ -2,7 +2,7 @@ from PIL import Image
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from starlette.responses import FileResponse
 import io
-import pickle
+import joblib
 import numpy as np
 from tensorflow.keras.models import load_model
 
@@ -32,10 +32,7 @@ animal_classes = {0: 'antelope', 1: 'badger', 2: 'bat', 3: 'bear', 4: 'bee', 5: 
                   87: 'wombat',
                   88: 'woodpecker', 89: 'zebra'}
 
-plant_model = load_model("models/plant.h5", compile=False)
-plant_input_shape = plant_model.layers[0].input_shape
-with open('models/plant_label_transform.pkl', 'rb') as f:
-    plant_label_transform = pickle.load(f)
+plant_model = joblib.load('models/plant_model.pkl')
 
 
 # Define the /prediction route
@@ -73,19 +70,14 @@ async def predict_plant(file: UploadFile = File(...)):
 
     # Read image contents
     contents = await file.read()
-    pil_image = Image.open(io.BytesIO(contents))
-    pil_image = pil_image.convert('RGB')
-
-    # Resize image to expected input shape
-    pil_image = pil_image.resize((plant_input_shape[1], plant_input_shape[2]))
-    numpy_image = np.array(pil_image).reshape((plant_input_shape[1], plant_input_shape[2], plant_input_shape[3]))
-    numpy_image = numpy_image / 255
-    numpy_image = np.expand_dims(numpy_image, axis=0)
-
-    predicted_probabilities = plant_model.predict(numpy_image)
-    predicted_labels = plant_label_transform.inverse_transform(predicted_probabilities)
-
-    return {"result": predicted_labels[0]}
+    pillow_img = Image.open(io.BytesIO(contents))
+    img = pillow_img.resize((180, 120))
+    img = np.array(img)
+    img = img[:, :, 1]  # green channel
+    flat_img = img.flatten()
+    flat_img = flat_img.reshape(1, -1)
+    predicted_class = plant_model.predict(flat_img)
+    return {'result': predicted_class[0]}
 
 
 @app.get("/")
